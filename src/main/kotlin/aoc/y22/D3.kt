@@ -4,16 +4,20 @@ import aoc.lines
 
 private class D3 {
     private fun <T> findDup(sets: List<Set<T>>): Set<T> = sets.reduce { acc, ts -> acc.intersect(ts) }
-    private fun <T> findDup(vararg sets: Set<T>): Set<T> = findDup(sets.toList())
 
     private fun priorityOf(it: Char): Int {
          return if (it.isLowerCase()) { it.code - 96 } else { it.code - 38 }
     }
 
+    private fun String.splitInto2Pieces(): List<String> {
+        return listOf(substring(0, length / 2), substring(length / 2))
+    }
+
     fun t1(sequence: Sequence<String>) {
         sequence
-            .map { Pair(it.substring(0, it.length / 2), it.substring(it.length / 2)) }
-            .map { findDup(it.first.toSet(), it.second.toSet()) }
+            .map { it.splitInto2Pieces() }
+            .map { it.map { i -> i.toSet() } }
+            .map { findDup(it) }
             .sumOf { priorityOf(it.first()) }
             .also { println(it) }
     }
