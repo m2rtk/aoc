@@ -3,9 +3,8 @@ package aoc.y22
 import aoc.lines
 
 private class D3 {
-    private fun <T> findDup(a: Set<T>, b: Set<T>): Set<T> {
-        return a.intersect(b)
-    }
+    private fun <T> findDup(sets: List<Set<T>>): Set<T> = sets.reduce { acc, ts -> acc.intersect(ts) }
+    private fun <T> findDup(vararg sets: Set<T>): Set<T> = findDup(sets.toList())
 
     private fun priorityOf(it: Char): Int {
          return if (it.isLowerCase()) { it.code - 96 } else { it.code - 38 }
@@ -15,32 +14,16 @@ private class D3 {
         sequence
             .map { Pair(it.substring(0, it.length / 2), it.substring(it.length / 2)) }
             .map { findDup(it.first.toSet(), it.second.toSet()) }
-            .map { it.first() }
-            .map { priorityOf(it) }
-            .sum()
+            .sumOf { priorityOf(it.first()) }
             .also { println(it) }
     }
 
-    private fun findDup2(lists: List<String>): Char {
-        val sets = lists.map { it.toSet() }
-
-        return findDup(findDup(sets[0], sets[1]), sets[2]).first()
-    }
-
     fun t2(sequence: Sequence<String>) {
-        val groups = mutableListOf<List<String>>()
-        var group = mutableListOf<String>()
-        sequence.forEachIndexed { index, item ->
-            group.add(item)
-            if ((index + 1) % 3 == 0) {
-                groups.add(group)
-                group = mutableListOf()
-            }
-        }
-
-        groups
-            .map { findDup2(it) }
-            .sumOf { priorityOf(it) }
+        sequence
+            .chunked(3)
+            .map { it.map { i -> i.toSet() } }
+            .map { findDup(it) }
+            .sumOf { priorityOf(it.first()) }
             .also { println(it) }
     }
 }
