@@ -15,17 +15,17 @@ private class D4 {
     }
 
     private fun IntRange.overlapsCompletely(other: IntRange): Boolean {
-        return this.first <= other.first && this.last >= other.last
+        return first <= other.first && last >= other.last
     }
 
     private fun IntRange.overlapsABit(other: IntRange): Boolean {
-        return this.any { other.contains(it) }
+        return any { other.contains(it) }
     }
 
     fun t1(sequence: Sequence<String>) {
         sequence
             .map { parse(it) }
-            .filter { it.first.overlapsCompletely(it.second) || it.second.overlapsCompletely(it.first) }
+            .filter { (a, b) ->  a.overlapsCompletely(b) || b.overlapsCompletely(a) }
             .count()
             .also { println(it) }
     }
@@ -33,7 +33,7 @@ private class D4 {
     fun t2(sequence: Sequence<String>) {
         sequence
             .map { parse(it) }
-            .filter { it.first.overlapsABit(it.second) }
+            .filter { (a, b) ->  a.overlapsABit(b) }
             .count()
             .also { println(it) }
     }
