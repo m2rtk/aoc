@@ -5,13 +5,13 @@ package aoc.y{YEAR}
 import aoc.Puzzle
 
 class D{DAY}P1 : Puzzle {
-    override fun solve(input: String): String {
-        TODO()
+    override fun solve(input: String): Any {
+        return -1
     }
 }
 
 class D{DAY}P2 : Puzzle {
-    override fun solve(input: String): String {
-        TODO()
+    override fun solve(input: String): Any {
+        return -1
     }
 }
