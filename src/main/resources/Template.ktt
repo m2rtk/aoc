@@ -1,0 +1,17 @@
+@file:Suppress("unused")
+
+package aoc.y{YEAR}
+
+import aoc.Puzzle
+
+class D{DAY}P1 : Puzzle {
+    override fun solve(input: String): String {
+        TODO()
+    }
+}
+
+class D{DAY}P2 : Puzzle {
+    override fun solve(input: String): String {
+        TODO()
+    }
+}

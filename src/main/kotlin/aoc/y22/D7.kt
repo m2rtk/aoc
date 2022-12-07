@@ -1,98 +1,108 @@
+@file:Suppress("unused")
+
 package aoc.y22
 
-import aoc.lines
+import aoc.Puzzle
 
-private class D7  {
 
-    sealed interface Item {
-        fun print(indent: Int = 0)
-        fun size(): Int
+private sealed interface Item {
+    fun print(indent: Int = 0)
+    fun size(): Int
+}
+
+private data class File(val name: String, val size: Int) : Item {
+
+    override fun size(): Int = size
+
+    override fun print(indent: Int) {
+        println(" ".repeat(indent) + "- $name (file, size=$size)")
+    }
+}
+
+private data class Dir(val name: String, val parent: Dir? = null, val items: MutableList<Item> = mutableListOf()) :
+    Item {
+
+    override fun size() = items.sumOf { it.size() }
+
+    fun allDirs(): List<Dir> {
+        val dirs = mutableListOf(this)
+
+        items.filterIsInstance<Dir>().forEach { dirs.addAll(it.allDirs()) }
+
+        return dirs
     }
 
-    data class File(val name: String, val size: Int) : Item {
-
-        override fun size(): Int = size
-
-        override fun print(indent: Int) {
-            println(" ".repeat(indent) + "- $name (file, size=$size)")
-        }
-    }
-    data class Dir(val name: String, val parent: Dir? = null, val items: MutableList<Item> = mutableListOf()) : Item {
-
-        override fun size() = items.sumOf { it.size() }
-
-        fun allDirs(): List<Dir> {
-            val dirs = mutableListOf(this)
-
-            items.filterIsInstance<Dir>().forEach { dirs.addAll(it.allDirs()) }
-
-            return dirs
-        }
-
-        override fun print(indent: Int) {
-            println(" ".repeat(indent) + "- $name (dir)")
-            for (item in items) {
-                item.print(indent + 2)
-            }
+    override fun print(indent: Int) {
+        println(" ".repeat(indent) + "- $name (dir)")
+        for (item in items) {
+            item.print(indent + 2)
         }
     }
 
-    fun build(sequence: Sequence<String>): Dir {
-        val lines = sequence.toList()
-        var pointer = 1
+    override fun toString(): String {
+        return "Dir(name='$name', items=$items)"
+    }
+}
 
-        assert(lines[0] == "$ cd /")
+private fun build(lines: List<String>): Dir {
+    var pointer = 1
 
-        val root = Dir("/")
-        var currentDir = root
+    assert(lines[0] == "$ cd /")
 
-        while (pointer < lines.size) {
-            val line = lines[pointer++]
+    val root = Dir("/")
+    var currentDir = root
 
-            if (line == "$ ls") {
-                while (true) {
-                    if (pointer == lines.size) {
-                        break
-                    }
-                    if (lines[pointer].startsWith("$")) {
-                        break
-                    } else {
-                        val (type, name) = lines[pointer].split(" ", limit = 2)
-                        if (type == "dir") {
-                            currentDir.items.add(Dir(name, parent = currentDir))
-                        } else {
-                            currentDir.items.add(File(name, size = type.toInt()))
-                        }
-                        pointer++
-                    }
+    while (pointer < lines.size) {
+        val line = lines[pointer++]
+
+        if (line == "$ ls") {
+            while (true) {
+                if (pointer == lines.size) {
+                    break
                 }
-            } else if (line.startsWith("$ cd")) {
-                val target = line.split(" ", limit = 3)[2]
-
-                currentDir = if (target == ".." && currentDir.parent != null) {
-                    currentDir.parent!!
-                } else if (target == "/") {
-                    root
+                if (lines[pointer].startsWith("$")) {
+                    break
                 } else {
-                    currentDir.items.filterIsInstance<Dir>().find { it.name == target } ?: throw RuntimeException("No such dir $target in ${currentDir.name}")
+                    val (type, name) = lines[pointer].split(" ", limit = 2)
+                    if (type == "dir") {
+                        currentDir.items.add(Dir(name, parent = currentDir))
+                    } else {
+                        currentDir.items.add(File(name, size = type.toInt()))
+                    }
+                    pointer++
                 }
             }
-        }
+        } else if (line.startsWith("$ cd")) {
+            val target = line.split(" ", limit = 3)[2]
 
-        return root
+            currentDir = if (target == ".." && currentDir.parent != null) {
+                currentDir.parent!!
+            } else if (target == "/") {
+                root
+            } else {
+                currentDir.items.filterIsInstance<Dir>().find { it.name == target }
+                    ?: throw RuntimeException("No such dir $target in ${currentDir.name}")
+            }
+        }
     }
 
-    fun t1(sequence: Sequence<String>) {
-        val root = build(sequence)
+    return root
+}
 
-        root.allDirs()
+
+class D7P1 : Puzzle {
+    override fun solve(input: String): Any {
+        val root = build(input.lines())
+
+        return root.allDirs()
             .filter { it.size() <= 100000 }
             .sumOf { it.size() }
-            .also { println(it) }
     }
+}
 
-    fun t2(sequence: Sequence<String>) {
-        val root = build(sequence)
+class D7P2 : Puzzle {
+    override fun solve(input: String): Any {
+        val root = build(input.lines())
 
         val totalSpace = 70_000_000
         val usedSpace = root.size()
@@ -100,21 +110,9 @@ private class D7  {
         val targetUnusedSpace = 30_000_000
         val missingSpace = targetUnusedSpace - unusedSpace
 
-        root.allDirs()
+        return root.allDirs()
             .filter { it.size() >= missingSpace }
             .minBy { it.size() }
-            .also { println(it.size()) }
+            .size()
     }
-}
-
-fun main() {
-    fun sample() = lines("/aoc/y22/D7_sample.txt")
-    fun input() = lines("/aoc/y22/D7_input.txt")
-
-    val d = D7()
-
-    d.t1(sample())
-    d.t1(input())
-    d.t2(sample())
-    d.t2(input())
 }
