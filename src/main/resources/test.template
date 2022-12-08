@@ -1,0 +1,28 @@
+@file:Suppress("unused")
+
+package aoc.y{YEAR}
+
+import aoc.run
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
+
+class D{DAY}Test {
+
+    private val p1Solution = ""
+    private val p2Solution = ""
+
+    private fun p1() = D{DAY}P1()
+    private fun p2() = D{DAY}P2()
+
+    @Test
+    fun input1() {
+        assertThat(p1().run("input")).isEqualTo(p1Solution)
+    }
+
+    @Test
+    fun input2() {
+        assertThat(p2().run("input")).isEqualTo(p2Solution)
+    }
+}

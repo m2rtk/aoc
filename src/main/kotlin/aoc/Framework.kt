@@ -14,10 +14,15 @@ interface Puzzle {
 
 private fun Puzzle.filesDir(): Path = Path("src/main/resources/" + javaClass.packageName.replace('.', '/') + '/')
 
-private fun Puzzle.loadInput(): Path {
-    val day = javaClass.simpleName.split("P")[0].removePrefix("D").toInt()
-    val year = "20" + javaClass.name.toString().split(".", limit = 3)[1].removePrefix("y")
-    val filePath = filesDir().resolve("D${day}_input.txt")
+private fun downloadInputFile(year: Int, day: Int): Path {
+    val yy = year.toString().takeLast(2)
+    val dd = day.toString()
+    val filePath = Path("src/main/resources/aoc/y${yy}/D${dd}_input.txt")
+
+    if (Files.exists(filePath)) {
+        return filePath
+    }
+
     val cookie = Files.readString(Path.of("session.cookie"))
 
     val url = URL("https://adventofcode.com/$year/day/$day/input")
@@ -26,7 +31,8 @@ private fun Puzzle.loadInput(): Path {
     connection.requestMethod = "GET"
     connection.setRequestProperty("Cookie", "session=$cookie")
     connection.inputStream.use {
-        it.transferTo(Files.newOutputStream(filePath))
+        val s = it.readAllBytes().decodeToString().removeSuffix("\n")
+        Files.writeString(filePath, s)
     }
 
     println("Downloaded input from $url to $filePath")
@@ -41,27 +47,30 @@ private fun Puzzle.input(namePart: String): List<Path> {
         .filter { it.fileName.toString().startsWith(dayName) }
         .toList()
 
-    val files = dayFiles.filter { it.fileName.toString().contains(namePart) }
-
-    return files.ifEmpty {
-        if (namePart == "input") {
-            listOf(loadInput())
-        } else {
-            println("Could not find any matching files for $namePart in $dir")
-            listOf()
-        }
-    }
+    return dayFiles.filter { it.fileName.toString().contains(namePart) }
 }
 
-private fun createPuzzleFile(year: Int, day: Int) {
+private fun createFiles(year: Int, day: Int) {
     val yy = year.toString().takeLast(2)
-    val contents = Files.readString(Path.of("src/main/resources/Template.ktt"))
-        .replace("{YEAR}", yy)
-        .replace("{DAY}", day.toString())
+    val dd = day.toString()
 
-    val file = Path.of("src/main/kotlin/aoc/y${yy}/D${day}.kt")
-    Files.writeString(file, contents)
-    println("Created new file $file")
+    val file = Path.of("src/main/kotlin/aoc/y${yy}/D${dd}.kt")
+    if (Files.notExists(file)) {
+        val puzzleFileContents = Files.readString(Path.of("src/main/resources/file.template"))
+            .replace("{YEAR}", yy)
+            .replace("{DAY}", dd)
+        Files.writeString(file, puzzleFileContents)
+        println("Created new file $file")
+    }
+
+    val testFile = Path.of("src/test/kotlin/aoc/y${yy}/D${dd}Test.kt")
+    if (Files.notExists(testFile)) {
+        val testFileContents = Files.readString(Path.of("src/main/resources/test.template"))
+            .replace("{YEAR}", yy)
+            .replace("{DAY}", dd)
+        Files.writeString(testFile, testFileContents)
+        println("Created new file $testFile")
+    }
 }
 
 internal fun findPuzzle(year: Int, day: Int, part: Int): Puzzle? {
@@ -85,26 +94,47 @@ internal fun findPuzzles(year: Int, day: Int): List<Puzzle> {
     findPuzzle(year, day, 1)?.let { puzzles.add(it) }
     findPuzzle(year, day, 2)?.let { puzzles.add(it) }
 
-    if (puzzles.isEmpty()) {
-        createPuzzleFile(year, day)
-    }
+    createFiles(year, day)
+    downloadInputFile(year, day)
+
     return puzzles
 }
 
-fun Puzzle.run(inputNamePart: String = "input") {
+fun Puzzle.run(inputNamePart: String = "input"): Any? {
     val files = input(inputNamePart)
+
+    if (inputNamePart == "input") {
+        return run(files[0])
+    }
     for (file in files) {
         run(file)
     }
+
+    return null
 }
 
 fun Puzzle.runSamples() = run("sample")
 
-fun Puzzle.run(file: Path) {
-    try {
-        println("${javaClass.simpleName}(${file}) = ${solve(Files.readString(file))}")
+fun Puzzle.runRaw(input: String): Any? {
+    return try {
+        val result = solve(input)
+        println("${javaClass.simpleName}(${input}) = $result")
+        result
+    } catch (e: Exception) {
+        println("${javaClass.simpleName}(${input}) = ERROR ${e.message}")
+        e.printStackTrace(System.out)
+        null
+    }
+}
+
+fun Puzzle.run(file: Path): Any? {
+    return try {
+        val result = solve(Files.readString(file))
+        println("${javaClass.simpleName}(${file}) = $result")
+        result
     } catch (e: Exception) {
         println("${javaClass.simpleName}(${file}) = ERROR ${e.message}")
         e.printStackTrace(System.out)
+        null
     }
 }
