@@ -104,7 +104,7 @@ fun Puzzle.run(file: Path) {
     try {
         println("${javaClass.simpleName}(${file}) = ${solve(Files.readString(file))}")
     } catch (e: Exception) {
-        println("${javaClass.simpleName}(${file}) = ERROR")
-        e.printStackTrace()
+        println("${javaClass.simpleName}(${file}) = ERROR ${e.message}")
+        e.printStackTrace(System.out)
     }
 }

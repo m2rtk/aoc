@@ -2,7 +2,7 @@ package aoc
 
 
 fun main() {
-    val puzzles = findPuzzles(2015, 5)
+    val puzzles = findPuzzles(2022, 8)
     puzzles.forEach { it.runSamples() }
     puzzles.forEach { it.run() }
 
