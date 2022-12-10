@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource
 
 class D{DAY}Test {
 
-    private val p1Solution = ""
-    private val p2Solution = ""
+    private val p1Solution: Any = 0
+    private val p2Solution: Any = 0
 
     private fun p1() = D{DAY}P1()
     private fun p2() = D{DAY}P2()

@@ -59,6 +59,7 @@ private fun createFiles(year: Int, day: Int) {
         val puzzleFileContents = Files.readString(Path.of("src/main/resources/file.template"))
             .replace("{YEAR}", yy)
             .replace("{DAY}", dd)
+        Files.createDirectories(file.parent)
         Files.writeString(file, puzzleFileContents)
         println("Created new file $file")
     }
@@ -68,6 +69,7 @@ private fun createFiles(year: Int, day: Int) {
         val testFileContents = Files.readString(Path.of("src/main/resources/test.template"))
             .replace("{YEAR}", yy)
             .replace("{DAY}", dd)
+        Files.createDirectories(testFile.parent)
         Files.writeString(testFile, testFileContents)
         println("Created new file $testFile")
     }
@@ -106,6 +108,11 @@ fun Puzzle.run(inputNamePart: String = "input"): Any? {
     if (inputNamePart == "input") {
         return run(files[0])
     }
+
+    if (files.size == 1) {
+        return run(files[0])
+    }
+
     for (file in files) {
         run(file)
     }
