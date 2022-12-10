@@ -1,18 +1,18 @@
 @file:Suppress("unused")
 
-package aoc.y{YEAR}.d{DAY}
+package aoc.y15.d6
 
 import aoc.run
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class D{DAY}Test {
+class D6Test {
 
-    private val p1Solution: Any = 0
-    private val p2Solution: Any = 0
+    private val p1Solution: Any = 543903
+    private val p2Solution: Any = 14687245
 
-    private fun p1() = D{DAY}P1()
-    private fun p2() = D{DAY}P2()
+    private fun p1() = D6P1()
+    private fun p2() = D6P2()
 
     @Test
     fun input1() {

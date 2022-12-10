@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package aoc.y{YEAR}
+package aoc.y{YEAR}.d{DAY}
 
 import aoc.Puzzle
 

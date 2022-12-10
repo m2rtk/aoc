@@ -17,11 +17,13 @@ private fun Puzzle.filesDir(): Path = Path("src/main/resources/" + javaClass.pac
 private fun downloadInputFile(year: Int, day: Int): Path {
     val yy = year.toString().takeLast(2)
     val dd = day.toString()
-    val filePath = Path("src/main/resources/aoc/y${yy}/D${dd}_input.txt")
+    val filePath = Path("src/main/resources/aoc/y${yy}/d${dd}/input.txt")
 
     if (Files.exists(filePath)) {
         return filePath
     }
+
+    Files.createDirectories(filePath.parent)
 
     val cookie = Files.readString(Path.of("session.cookie"))
 
@@ -40,21 +42,16 @@ private fun downloadInputFile(year: Int, day: Int): Path {
 }
 
 private fun Puzzle.input(namePart: String): List<Path> {
-    val dayName = javaClass.simpleName.split("P", limit = 2)[0]
-    val dir = filesDir()
-
-    val dayFiles = Files.walk(dir)
-        .filter { it.fileName.toString().startsWith(dayName) }
+    return Files.walk(filesDir())
+        .filter { it.fileName.toString().contains(namePart) }
         .toList()
-
-    return dayFiles.filter { it.fileName.toString().contains(namePart) }
 }
 
 private fun createFiles(year: Int, day: Int) {
     val yy = year.toString().takeLast(2)
     val dd = day.toString()
 
-    val file = Path.of("src/main/kotlin/aoc/y${yy}/D${dd}.kt")
+    val file = Path.of("src/main/kotlin/aoc/y${yy}/d${dd}/D${dd}.kt")
     if (Files.notExists(file)) {
         val puzzleFileContents = Files.readString(Path.of("src/main/resources/file.template"))
             .replace("{YEAR}", yy)
@@ -64,7 +61,7 @@ private fun createFiles(year: Int, day: Int) {
         println("Created new file $file")
     }
 
-    val testFile = Path.of("src/test/kotlin/aoc/y${yy}/D${dd}Test.kt")
+    val testFile = Path.of("src/test/kotlin/aoc/y${yy}/d${dd}/D${dd}Test.kt")
     if (Files.notExists(testFile)) {
         val testFileContents = Files.readString(Path.of("src/main/resources/test.template"))
             .replace("{YEAR}", yy)
@@ -76,7 +73,7 @@ private fun createFiles(year: Int, day: Int) {
 }
 
 internal fun findPuzzle(year: Int, day: Int, part: Int): Puzzle? {
-    val className = "aoc.y${year.toString().takeLast(2)}.D${day}P${part}"
+    val className = "aoc.y${year.toString().takeLast(2)}.d${day}.D${day}P${part}"
     return try {
         val clazz = Class.forName(className)
         if (Puzzle::class.java.isAssignableFrom(clazz)) {
@@ -104,10 +101,6 @@ internal fun findPuzzles(year: Int, day: Int): List<Puzzle> {
 
 fun Puzzle.run(inputNamePart: String = "input"): Any? {
     val files = input(inputNamePart)
-
-    if (inputNamePart == "input") {
-        return run(files[0])
-    }
 
     if (files.size == 1) {
         return run(files[0])
