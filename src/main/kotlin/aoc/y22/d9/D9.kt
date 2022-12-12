@@ -3,11 +3,24 @@
 package aoc.y22.d9
 
 import aoc.Puzzle
+import aoc.y22.Point
 import kotlin.text.StringBuilder
 
 enum class Direction {
     R, U, L, D
 }
+
+private val surroundingDeltas = listOf(
+    Point(1, 1),
+    Point(1, 0),
+    Point(1, -1),
+    Point(0, 1),
+    Point(0, 0),
+    Point(0, -1),
+    Point(-1, 1),
+    Point(-1, 0),
+    Point(-1, -1),
+)
 
 data class Movee(val dir: Direction, val amount: Int) {
     companion object {
@@ -18,66 +31,45 @@ data class Movee(val dir: Direction, val amount: Int) {
     }
 }
 
-data class Point(val x: Int, val y: Int) {
+fun Point.touches(p: Point): Boolean {
+    for (delta in surroundingDeltas) {
+        if (x + delta.x == p.x && y + delta.y == p.y) {
+            return true
+        }
+    }
+    return false
+}
 
-    companion object {
-        val surroundingDeltas = listOf(
-            Point(1, 1),
-            Point(1, 0),
-            Point(1, -1),
-            Point(0, 1),
-            Point(0, 0),
-            Point(0, -1),
-            Point(-1, 1),
-            Point(-1, 0),
-            Point(-1, -1),
-        )
+fun Point.attach(t: Point): Point {
+    val h = this
+    if (h.touches(t)) {
+        return t
     }
 
-    private fun touches(p: Point): Boolean {
-        for (delta in surroundingDeltas) {
-            if (x + delta.x == p.x && y + delta.y == p.y) {
-                return true
-            }
-        }
-        return false
-    }
+    val xDiff = h.x - t.x
+    val yDiff = h.y - t.y
 
-    fun attach(t: Point): Point {
-        val h = this
-        if (h.touches(t)) {
-            return t
-        }
-
-        val xDiff = h.x - t.x
-        val yDiff = h.y - t.y
-
-        // if the head is ever two step directly up,down,left,right - tail follows
-        return if (t.y == h.y) {
-            return if (t.x > h.x) {
-                Point(h.x + 1, t.y)
-            } else {
-                Point(h.x - 1, t.y)
-            }
-        } else if (t.x == h.x) {
-            return if (t.y > h.y) {
-                Point(t.x, h.y + 1)
-            } else {
-                Point(t.x, h.y - 1)
-            }
-        } else if (xDiff > 0 && yDiff > 0) {
-            Point(t.x + 1, t.y + 1)
-        } else if (xDiff > 0) {
-            Point(t.x + 1, t.y - 1)
-        } else if (yDiff > 0) {
-            Point(t.x - 1, t.y + 1)
+    // if the head is ever two step directly up,down,left,right - tail follows
+    return if (t.y == h.y) {
+        return if (t.x > h.x) {
+            Point(h.x + 1, t.y)
         } else {
-            Point(t.x - 1, t.y - 1)
+            Point(h.x - 1, t.y)
         }
-    }
-
-    override fun toString(): String {
-        return "($x, $y)"
+    } else if (t.x == h.x) {
+        return if (t.y > h.y) {
+            Point(t.x, h.y + 1)
+        } else {
+            Point(t.x, h.y - 1)
+        }
+    } else if (xDiff > 0 && yDiff > 0) {
+        Point(t.x + 1, t.y + 1)
+    } else if (xDiff > 0) {
+        Point(t.x + 1, t.y - 1)
+    } else if (yDiff > 0) {
+        Point(t.x - 1, t.y + 1)
+    } else {
+        Point(t.x - 1, t.y - 1)
     }
 }
 
