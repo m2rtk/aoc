@@ -13,8 +13,9 @@ I really wish I was using python right now
 [[0, 0, 0], [0, 0, 1], [1, 1, 0]]
  */
 
-sealed interface Item {
-    fun compareTo(right: Item): Result
+sealed interface Item : Comparable<Item> {
+    override fun compareTo(other: Item): Int = compare(other).ord
+    fun compare(right: Item): Result
 }
 
 enum class Result(val ord: Int) {
@@ -24,7 +25,7 @@ enum class Result(val ord: Int) {
 }
 
 data class IntWrapper(val value: Int) : Item {
-    override fun compareTo(right: Item): Result {
+    override fun compare(right: Item): Result {
         val left = this
 //        println("Compare $left vs $right")
 
@@ -37,7 +38,7 @@ data class IntWrapper(val value: Int) : Item {
                     Result.WRONG_ORDER
                 }
 
-            is ListWrapper -> ListWrapper(left).compareTo(right)
+            is ListWrapper -> ListWrapper(left).compare(right)
         }
     }
 
@@ -56,12 +57,12 @@ data class ListWrapper(val value: List<Item>) : Item {
         return value.toString()
     }
 
-    override fun compareTo(right: Item): Result {
+    override fun compare(right: Item): Result {
         val left = this
 //        println("Compare $left vs $right")
 
         when (right) {
-            is IntWrapper -> return left.compareTo(ListWrapper(right))
+            is IntWrapper -> return left.compare(ListWrapper(right))
 
             is ListWrapper -> {
                 for (i in 0 until max(left.size, right.size)) {
@@ -70,7 +71,7 @@ data class ListWrapper(val value: List<Item>) : Item {
                     } else if (right.size == i) {
                         Result.WRONG_ORDER
                     } else {
-                        val result = left[i].compareTo(right[i])
+                        val result = left[i].compare(right[i])
                         if (result == Result.CONTINUE) {
                             continue
                         } else {
@@ -160,7 +161,7 @@ data class Packets(val pairs: List<Pair<ListWrapper, ListWrapper>>) {
     fun sorted(): List<ListWrapper> {
         return pairs
             .flatMap { it.toList() }
-            .sortedWith{ left, right -> left.compareTo(right).ord }
+            .sorted()
             .reversed()
     }
 }
@@ -174,7 +175,7 @@ class D13P1 : Puzzle {
         for (i in packets.pairs.indices) {
             val (left, right) = packets.pairs[i]
 
-            val result = left.compareTo(right)
+            val result = left.compare(right)
 
             if (result == Result.RIGHT_ORDER) {
                 ok.add(i + 1)
