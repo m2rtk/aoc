@@ -11,7 +11,6 @@ interface Puzzle {
     fun solve(input: String): Any
 }
 
-
 private fun Puzzle.filesDir(): Path = Path("src/main/resources/" + javaClass.packageName.replace('.', '/') + '/')
 
 private fun downloadInputFile(year: Int, day: Int): Path {
