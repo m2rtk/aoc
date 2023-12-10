@@ -1,4 +1,4 @@
-package aoc.y22
+package aoc
 
 data class Point(val x: Int, val y: Int) {
 
@@ -25,7 +25,18 @@ data class Point(val x: Int, val y: Int) {
 
     fun translate(xd: Int = 0, yd: Int = 0) = Point(x + xd, y + yd)
     fun translate(other: Point) = translate(xd = other.x, yd = other.y)
+
     fun coerceBounds(xMin: Int, xMax: Int, yMin: Int, yMax: Int) = Point(x.coerceIn(xMin, xMax), y.coerceIn(yMin, yMax))
+
+    fun inBounds(bounds: Bounds): Point? {
+        if (this in bounds) {
+            return this
+        }
+
+        return null
+    }
+
+    operator fun minus(other: Point): Point = Point(x - other.x, y - other.y)
 
     fun surroundingPoints() = surroundingDeltas.map { this.translate(it) }
     fun surroundingPointsInBounds(xMin: Int, xMax: Int, yMin: Int, yMax: Int) = surroundingPoints()
@@ -35,3 +46,10 @@ data class Point(val x: Int, val y: Int) {
         return "($x, $y)"
     }
 }
+
+data class Bounds(val xRange: IntRange, val yRange: IntRange) {
+    operator fun contains(point: Point): Boolean {
+        return point.x in xRange && point.y in yRange
+    }
+}
+

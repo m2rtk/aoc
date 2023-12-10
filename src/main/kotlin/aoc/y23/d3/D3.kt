@@ -3,7 +3,7 @@
 package aoc.y23.d3
 
 import aoc.Puzzle
-import aoc.y22.Point
+import aoc.Point
 
 private data class EngineSchematic(
     val lines: List<String>

@@ -3,7 +3,7 @@
 package aoc.y22.d9
 
 import aoc.run
-import aoc.y22.Point
+import aoc.Point
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest

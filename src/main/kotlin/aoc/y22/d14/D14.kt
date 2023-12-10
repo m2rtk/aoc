@@ -3,7 +3,7 @@
 package aoc.y22.d14
 
 import aoc.Puzzle
-import aoc.y22.Point
+import aoc.Point
 import kotlin.math.max
 import kotlin.math.min
 

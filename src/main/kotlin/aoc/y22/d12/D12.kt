@@ -3,7 +3,7 @@
 package aoc.y22.d12
 
 import aoc.Puzzle
-import aoc.y22.Point
+import aoc.Point
 import java.util.LinkedList
 
 

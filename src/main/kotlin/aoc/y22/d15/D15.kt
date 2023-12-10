@@ -3,7 +3,7 @@
 package aoc.y22.d15
 
 import aoc.Puzzle
-import aoc.y22.Point
+import aoc.Point
 import kotlin.math.abs
 
 data class SensorAndBeacon(val sensor: Point, val beacon: Point) {

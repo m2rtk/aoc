@@ -3,7 +3,7 @@
 package aoc.y22.d9
 
 import aoc.Puzzle
-import aoc.y22.Point
+import aoc.Point
 import kotlin.text.StringBuilder
 
 enum class Direction {
