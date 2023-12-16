@@ -5,7 +5,8 @@ package aoc.y23.d10
 import aoc.Bounds
 import aoc.Point
 import aoc.Puzzle
-import aoc.y23.d10.Direction.*
+import aoc.Direction
+import aoc.Direction.*
 import aoc.y23.d10.Pipe.*
 
 
@@ -19,30 +20,6 @@ private val charToPipe = mapOf(
     '.' to GROUND,
 )
 
-internal enum class Direction {
-    N, E, S, W;
-
-    fun opposite(): Direction = when (this) {
-        N -> S
-        E -> W
-        S -> N
-        W -> E
-    }
-
-    fun canBypass(): Set<Pipe> = when (this) {
-        N -> setOf(V, NE, NW, SW, SE)
-        E -> setOf(H, NE, NW, SW, SE)
-        S -> setOf(V, NE, NW, SW, SE)
-        W -> setOf(H, NE, NW, SW, SE)
-    }
-}
-
-internal fun Point.translate(direction: Direction) = when (direction) {
-    N -> translate(yd = -1)
-    E -> translate(xd = 1)
-    S -> translate(yd = 1)
-    W -> translate(xd = -1)
-}
 
 internal enum class Pipe(
     val prettyChar: Char,

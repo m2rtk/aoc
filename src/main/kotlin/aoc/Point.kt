@@ -25,6 +25,12 @@ data class Point(val x: Int, val y: Int) {
 
     fun translate(xd: Int = 0, yd: Int = 0) = Point(x + xd, y + yd)
     fun translate(other: Point) = translate(xd = other.x, yd = other.y)
+    fun translate(direction: Direction) = when (direction) {
+        Direction.N -> translate(yd = -1)
+        Direction.E -> translate(xd = 1)
+        Direction.S -> translate(yd = 1)
+        Direction.W -> translate(xd = -1)
+    }
 
     fun coerceBounds(xMin: Int, xMax: Int, yMin: Int, yMax: Int) = Point(x.coerceIn(xMin, xMax), y.coerceIn(yMin, yMax))
 
@@ -48,6 +54,9 @@ data class Point(val x: Int, val y: Int) {
 }
 
 data class Bounds(val xRange: IntRange, val yRange: IntRange) {
+    constructor(iterable: List<List<*>>) : this (iterable[0].indices, iterable.indices)
+    constructor(height: Int, width: Int) : this (0 until width, 0 until height)
+
     operator fun contains(point: Point): Boolean {
         return point.x in xRange && point.y in yRange
     }
