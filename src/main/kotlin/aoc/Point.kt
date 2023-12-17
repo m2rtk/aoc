@@ -21,6 +21,13 @@ data class Point(val x: Int, val y: Int) {
             Point(-1, 0),
             Point(-1, -1),
         )
+
+        val surroundingHorizontalVertical = listOf(
+            Point(1, 0),
+            Point(0, 1),
+            Point(0, -1),
+            Point(-1, 0),
+        )
     }
 
     fun translate(xd: Int = 0, yd: Int = 0) = Point(x + xd, y + yd)
@@ -45,6 +52,15 @@ data class Point(val x: Int, val y: Int) {
     operator fun minus(other: Point): Point = Point(x - other.x, y - other.y)
 
     fun surroundingPoints() = surroundingDeltas.map { this.translate(it) }
+    fun surroundingHorizontalVerticalPoints(bounds: Bounds? = null) = surroundingHorizontalVertical
+        .map { this.translate(it) }
+        .filter {
+            if (bounds == null) {
+                return@filter true
+            }
+
+            bounds.contains(it)
+        }
     fun surroundingPointsInBounds(xMin: Int, xMax: Int, yMin: Int, yMax: Int) = surroundingPoints()
         .filter { it.x in xMin until xMax && it.y in yMin until yMax }
 
@@ -56,6 +72,9 @@ data class Point(val x: Int, val y: Int) {
 data class Bounds(val xRange: IntRange, val yRange: IntRange) {
     constructor(iterable: List<List<*>>) : this (iterable[0].indices, iterable.indices)
     constructor(height: Int, width: Int) : this (0 until width, 0 until height)
+
+    val height = yRange.last + 1
+    val width = xRange.last + 1
 
     operator fun contains(point: Point): Boolean {
         return point.x in xRange && point.y in yRange
